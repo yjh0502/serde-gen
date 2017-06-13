@@ -40,3 +40,19 @@ pub struct Struct_continue {
     pub field_continue: String,
 }
 
+
+
+extern crate serde_json;
+
+use std::fs::File;
+use std::io::prelude::*;
+
+#[test]
+fn test() {
+    let filename = "tests/wikipedia_changes.json";
+    let mut file = File::open(filename).expect("failed to open file");
+
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).expect("failed to read file");
+    let _: Root = serde_json::from_str(&contents).expect("failed to decode");
+}

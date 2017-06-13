@@ -352,7 +352,24 @@ mod tests {
         let code = builder.build(v);
         println!("code:\n{}\n", code);
 
-        write!(&out_file, "{}", code)?;
+        write!(&out_file, "{}\n", code)?;
+        write!(&out_file,
+               r#"
+extern crate serde_json;
+
+use std::fs::File;
+use std::io::prelude::*;
+
+#[test]
+fn test() {{
+    let filename = "{}";
+    let mut file = File::open(filename).expect("failed to open file");
+
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).expect("failed to read file");
+    let _: Root = serde_json::from_str(&contents).expect("failed to decode");
+}}"#,
+               filename);
 
         Ok(())
     }
