@@ -2,21 +2,24 @@
 extern crate serde_derive;
 
 #[derive(Serialize,Deserialize)]
-pub struct Root {
-    pub batchcomplete: String,
+#[allow(non_snake_case)]
+#[allow(non_camel_case_types)]
+pub struct Root {    pub batchcomplete: String,
     #[serde(rename = "continue")]
     pub field_continue: Struct_continue,
     pub query: Struct_query,
 }
 
 #[derive(Serialize,Deserialize)]
-pub struct Struct_query {
-    pub recentchanges: Vec<Struct_recentchanges>,
+#[allow(non_snake_case)]
+#[allow(non_camel_case_types)]
+pub struct Struct_query {    pub recentchanges: Vec<Struct_recentchanges>,
 }
 
 #[derive(Serialize,Deserialize)]
-pub struct Struct_recentchanges {
-    #[serde(rename = "type")]
+#[allow(non_snake_case)]
+#[allow(non_camel_case_types)]
+pub struct Struct_recentchanges {    #[serde(rename = "type")]
     pub field_type: String,
     pub ns: usize,
     pub title: String,
@@ -34,8 +37,9 @@ pub struct Struct_recentchanges {
 }
 
 #[derive(Serialize,Deserialize)]
-pub struct Struct_continue {
-    pub rccontinue: String,
+#[allow(non_snake_case)]
+#[allow(non_camel_case_types)]
+pub struct Struct_continue {    pub rccontinue: String,
     #[serde(rename = "continue")]
     pub field_continue: String,
 }

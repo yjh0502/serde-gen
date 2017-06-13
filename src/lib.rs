@@ -173,7 +173,11 @@ impl TyBuilder {
         }
 
         while let Some((name, def)) = self.queue.pop() {
-            s.push_str(&format!("#[derive(Serialize,Deserialize)]\npub struct {} {{\n", name));
+            s.push_str(&format!(r#"#[derive(Serialize,Deserialize)]
+#[allow(non_snake_case)]
+#[allow(non_camel_case_types)]
+pub struct {} {{"#,
+                                name));
 
             for (name, ty) in def.into_iter() {
                 let field_name = field_name(&name);
@@ -369,7 +373,7 @@ fn test() {{
     file.read_to_string(&mut contents).expect("failed to read file");
     let _: Root = serde_json::from_str(&contents).expect("failed to decode");
 }}"#,
-               filename);
+               filename)?;
 
         Ok(())
     }
