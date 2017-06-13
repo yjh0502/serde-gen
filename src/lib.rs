@@ -95,23 +95,6 @@ impl std::ops::Add<Ty> for Ty {
             // fallback to any
             (s, o) => if s == o { s } else { Ty::Any },
         }
-
-        /*
-        if self == Ty::Unit {
-            return other;
-        } else if other == Ty::Unit {
-            return self;
-        }
-
-        // nullable types
-        if self == Ty::None {
-            return Ty::Some(Box::new(other));
-        } else if other == Ty::None {
-            return Ty::Some(Box::new(self));
-        }
-
-        if self == other { self } else { Ty::Any }
-        */
     }
 }
 
