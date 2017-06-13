@@ -176,7 +176,8 @@ impl TyBuilder {
             s.push_str(&format!(r#"#[derive(Serialize,Deserialize)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
-pub struct {} {{"#,
+pub struct {} {{
+"#,
                                 name));
 
             for (name, ty) in def.into_iter() {
@@ -196,7 +197,6 @@ pub struct {} {{"#,
         s
     }
 }
-
 
 impl<'de> Deserialize<'de> for Ty {
     #[inline]
@@ -354,7 +354,6 @@ mod tests {
 
         let mut builder = TyBuilder::new();
         let code = builder.build(v);
-        println!("code:\n{}\n", code);
 
         write!(&out_file, "{}\n", code)?;
         write!(&out_file,

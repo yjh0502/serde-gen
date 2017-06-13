@@ -4,13 +4,15 @@ extern crate serde_derive;
 #[derive(Serialize,Deserialize)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
-pub struct Root {    pub SearchParkInfoService: Struct_SearchParkInfoService,
+pub struct Root {
+    pub SearchParkInfoService: Struct_SearchParkInfoService,
 }
 
 #[derive(Serialize,Deserialize)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
-pub struct Struct_SearchParkInfoService {    pub list_total_count: usize,
+pub struct Struct_SearchParkInfoService {
+    pub list_total_count: usize,
     pub RESULT: Struct_RESULT,
     pub row: Vec<Struct_row>,
 }
@@ -18,7 +20,8 @@ pub struct Struct_SearchParkInfoService {    pub list_total_count: usize,
 #[derive(Serialize,Deserialize)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
-pub struct Struct_row {    pub P_IDX: String,
+pub struct Struct_row {
+    pub P_IDX: String,
     pub P_PARK: String,
     pub P_LIST_CONTENT: String,
     pub P_ADDR: String,
@@ -35,7 +38,8 @@ pub struct Struct_row {    pub P_IDX: String,
 #[derive(Serialize,Deserialize)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
-pub struct Struct_RESULT {    pub CODE: String,
+pub struct Struct_RESULT {
+    pub CODE: String,
     pub MESSAGE: String,
 }
 
