@@ -7,7 +7,6 @@ extern crate error_chain;
 extern crate serde_gen;
 
 use std::fs::File;
-use std::io::prelude::*;
 
 use serde_gen::*;
 use clap::{App, Arg};
@@ -19,36 +18,49 @@ error_chain!{
     }
 }
 
-fn run() -> Result<()> {
-    let matches = App::new("serde_gen")
-        .version("0.1")
-        .author("Jihyun Yu <yjh0502@gmail.com")
-        .arg(Arg::with_name("in")
-                 .long("in")
-                 .required(true)
-                 .takes_value(true))
-        .arg(Arg::with_name("out")
-                 .long("out")
-                 .required(true)
-                 .takes_value(true))
-        .get_matches();
-
-    let in_filename = matches.value_of("in").ok_or("no input file")?;
-    let out_filename = matches.value_of("out").ok_or("no input file")?;
-
-    let mut file = File::open(in_filename)?;
-    let out_file = File::create(out_filename)?;
-
+fn run_translate<R, W>(r: &mut R, w: &mut W) -> Result<()>
+    where R: std::io::Read,
+          W: std::io::Write
+{
     let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
+    r.read_to_string(&mut contents)?;
 
     let v: Ty = serde_json::from_str(&contents)?;
 
     let mut builder = TyBuilder::new();
     let code = builder.build(v);
 
-    write!(&out_file, "{}\n", code)?;
+    write!(w, "{}\n", code)?;
     Ok(())
+}
+
+fn run() -> Result<()> {
+    let matches = App::new("serde_gen")
+        .version("0.1")
+        .author("Jihyun Yu <yjh0502@gmail.com")
+        .arg(Arg::with_name("in")
+                 .long("in")
+                 .takes_value(true)
+                 .help("input JSON filename, standard input if not exists"))
+        .arg(Arg::with_name("out")
+                 .long("out")
+                 .takes_value(true)
+                 .help("output rust filename, standard output if not exists"))
+        .get_matches();
+
+    match (matches.value_of("in"), matches.value_of("out")) {
+        (Some(in_filename), Some(out_filename)) => {
+            run_translate(&mut File::open(in_filename)?,
+                          &mut File::create(out_filename)?)
+        }
+        (Some(in_filename), None) => {
+            run_translate(&mut File::open(in_filename)?, &mut std::io::stdout())
+        }
+        (None, Some(out_filename)) => {
+            run_translate(&mut std::io::stdin(), &mut File::create(out_filename)?)
+        }
+        (None, None) => run_translate(&mut std::io::stdin(), &mut std::io::stdout()),
+    }
 }
 
 fn main() {
