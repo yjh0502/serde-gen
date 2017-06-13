@@ -5,5 +5,6 @@ authors = ["yjh0502 <yjh0502@gmail.com>"]
 
 [dependencies]
 serde = "1"
+serde_derive = "1"
 serde_json = "1"
 error-chain = "0.10"

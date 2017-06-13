@@ -1,14 +1,22 @@
+#[macro_use]
+extern crate serde_derive;
+
+#[derive(Serialize,Deserialize)]
 pub struct Root {
     pub batchcomplete: String,
+    #[serde(rename = "continue")]
     pub field_continue: Struct_continue,
     pub query: Struct_query,
 }
 
+#[derive(Serialize,Deserialize)]
 pub struct Struct_query {
     pub recentchanges: Vec<Struct_recentchanges>,
 }
 
+#[derive(Serialize,Deserialize)]
 pub struct Struct_recentchanges {
+    #[serde(rename = "type")]
     pub field_type: String,
     pub ns: usize,
     pub title: String,
@@ -25,7 +33,10 @@ pub struct Struct_recentchanges {
     pub new: Option<String>,
 }
 
+#[derive(Serialize,Deserialize)]
 pub struct Struct_continue {
     pub rccontinue: String,
+    #[serde(rename = "continue")]
     pub field_continue: String,
 }
+

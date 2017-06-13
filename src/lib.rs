@@ -165,7 +165,7 @@ impl TyBuilder {
     }
 
     pub fn build(&mut self, ty: Ty) -> String {
-        let mut s = String::new();
+        let mut s = "#[macro_use]\nextern crate serde_derive;\n\n".to_owned();
 
         if let Ty::Map(v) = ty {
             let name = format!("Root");
@@ -173,11 +173,18 @@ impl TyBuilder {
         }
 
         while let Some((name, def)) = self.queue.pop() {
-            s.push_str(&format!("pub struct {} {{\n", name));
+            s.push_str(&format!("#[derive(Serialize,Deserialize)]\npub struct {} {{\n", name));
 
             for (name, ty) in def.into_iter() {
-                s.push_str(&format!("    pub {}: {},\n",
-                                   field_name(&name),
+                let field_name = field_name(&name);
+                let prefix = if field_name == name {
+                    "".to_owned()
+                } else {
+                    format!("    #[serde(rename = \"{}\")]\n", name)
+                };
+                s.push_str(&format!("{}    pub {}: {},\n",
+                                   prefix,
+                                   field_name,
                                    self.ty_str(&name, ty)));
             }
             s.push_str("}\n\n");
@@ -333,6 +340,8 @@ mod tests {
 
     fn test_read_file(filename: &str) -> Result<()> {
         let mut file = File::open(filename)?;
+        let out_file = File::create(filename.replace(".json", ".rs"))?;
+
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
 
@@ -340,7 +349,11 @@ mod tests {
         println!("def: {:?}\n", v);
 
         let mut builder = TyBuilder::new();
-        println!("code:\n{}\n", builder.build(v));
+        let code = builder.build(v);
+        println!("code:\n{}\n", code);
+
+        write!(&out_file, "{}", code)?;
+
         Ok(())
     }
 
