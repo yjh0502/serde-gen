@@ -1,6 +1,6 @@
 # serde-gen
 
-Generate rust structure from JSON value
+Generate rust struct types from JSON value
 
 # Tutorial
 
