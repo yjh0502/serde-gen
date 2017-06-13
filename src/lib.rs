@@ -357,8 +357,20 @@ mod tests {
         Ok(())
     }
 
+    fn test_run_dir(dirname: &str) -> Result<()> {
+        let paths = std::fs::read_dir(dirname)?;
+        for path in paths {
+            let filename = format!("{}", path?.path().display());
+            if !filename.ends_with(".json") {
+                continue;
+            }
+            test_read_file(&filename)?;
+        }
+        Ok(())
+    }
+
     #[test]
-    fn test_wikipedia() {
-        test_read_file("tests/wikipedia_changes.json").expect("failed to test file");
+    fn test_testcases() {
+        test_run_dir("tests").expect("failed to handle testcases");
     }
 }
