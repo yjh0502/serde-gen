@@ -2,6 +2,8 @@
 
 Generate rust struct types from JSON value
 
+[![Build Status](https://travis-ci.org/yjh0502/serde-gen.svg?branch=master)](https://travis-ci.org/yjh0502/serde-gen)
+
 # Tutorial
 
 ```sh
