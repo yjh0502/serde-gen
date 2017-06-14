@@ -22,15 +22,10 @@ fn run_translate<R, W>(r: &mut R, w: &mut W) -> Result<()>
     where R: std::io::Read,
           W: std::io::Write
 {
-    let mut contents = String::new();
-    r.read_to_string(&mut contents)?;
-
-    let v: Ty = serde_json::from_str(&contents)?;
+    let v: Ty = serde_json::from_reader(r)?;
 
     let mut builder = TyBuilder::new();
-    let code = builder.build(v);
-
-    write!(w, "{}\n", code)?;
+    write!(w, "{}\n", builder.build(v))?;
     Ok(())
 }
 
