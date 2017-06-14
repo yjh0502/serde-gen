@@ -83,7 +83,7 @@ impl TyBuilder {
         }
 
         while let Some((name, def)) = self.queue.pop() {
-            s.push_str(&format!(r#"#[derive(Serialize,Deserialize)]
+            s.push_str(&format!(r#"#[derive(Serialize,Deserialize,Debug,PartialEq)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct {} {{
@@ -157,21 +157,8 @@ mod tests {
         println!("{:?}", v);
     }
 
-    fn test_read_file(filename: &str) -> Result<()> {
-        let mut file = File::open(filename)?;
-        let out_file = File::create(filename.replace(".json", ".rs"))?;
-
-        let mut contents = String::new();
-        file.read_to_string(&mut contents)?;
-
-        let v: Ty = serde_json::from_str(&contents)?;
-        println!("def: {:?}\n", v);
-
-        let mut builder = TyBuilder::new();
-        let code = builder.build(v);
-
-        write!(&out_file, "{}\n", code)?;
-        write!(&out_file,
+    fn write_test_runner<W: Write>(w: &mut W, filename: &str) -> Result<()> {
+        write!(w,
                r#"
 extern crate serde_json;
 
@@ -185,9 +172,22 @@ fn test() {{
 
     let mut contents = String::new();
     file.read_to_string(&mut contents).expect("failed to read file");
-    let _: Root = serde_json::from_str(&contents).expect("failed to decode");
+    let decoded: Root = serde_json::from_str(&contents).expect("failed to decode");
+
+    let encoded = serde_json::to_string(&decoded).expect("failed to encode");
+    let decoded2: Root = serde_json::from_str(&encoded).expect("failed to decode");
+    assert_eq!(decoded, decoded2);
 }}"#,
                filename)?;
+        Ok(())
+    }
+
+    fn test_read_file(filename: &str) -> Result<()> {
+        let mut file = File::open(filename)?;
+        let mut out_file = File::create(filename.replace(".json", ".rs"))?;
+
+        translate(&mut file, &mut out_file)?;
+        write_test_runner(&mut out_file, filename)?;
 
         Ok(())
     }
