@@ -4,6 +4,7 @@ extern crate clap;
 
 extern crate serde_gen;
 
+use std::io::Write;
 use std::fs::File;
 
 use serde_gen::*;
@@ -13,29 +14,33 @@ fn run() -> Result<()> {
     let matches = App::new("serde_gen")
         .version("0.1")
         .author("Jihyun Yu <yjh0502@gmail.com")
-        .arg(Arg::with_name("in")
-                 .long("in")
-                 .takes_value(true)
-                 .help("input JSON filename, standard input if not exists"))
         .arg(Arg::with_name("out")
                  .long("out")
                  .takes_value(true)
                  .help("output rust filename, standard output if not exists"))
+        .arg(Arg::with_name("INPUT")
+                 .help("Sets the input file to use")
+                 .required(true)
+                 .multiple(true))
         .get_matches();
 
-    match (matches.value_of("in"), matches.value_of("out")) {
-        (Some(in_filename), Some(out_filename)) => {
-            translate(&mut File::open(in_filename)?,
-                      &mut File::create(out_filename)?)
-        }
-        (Some(in_filename), None) => {
-            translate(&mut File::open(in_filename)?, &mut std::io::stdout())
-        }
-        (None, Some(out_filename)) => {
-            translate(&mut std::io::stdin(), &mut File::create(out_filename)?)
-        }
-        (None, None) => translate(&mut std::io::stdin(), &mut std::io::stdout()),
+    let mut ty: Ty = Ty::Unit;
+
+    if !matches.is_present("INPUT") {
+        ty = ty + serde_json::from_reader(std::io::stdin())?;
     }
+    for filename in matches.values_of("INPUT").unwrap() {
+        let mut f = File::open(filename)?;
+        ty = ty + serde_json::from_reader(&mut f)?;
+    }
+
+    let mut builder = TyBuilder::new();
+    let out = builder.build(ty);
+    match matches.value_of("out") {
+        Some(filename) => write!(&mut File::create(filename)?, "{}\n", out)?,
+        None => write!(&mut std::io::stdout(), "{}\n", out)?,
+    };
+    Ok(())
 }
 
 fn main() {
