@@ -2,7 +2,7 @@ use std;
 use serde;
 use serde::de::*;
 
-#[derive(Debug,Clone,PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Ty {
     Any,
     Unit,
@@ -94,7 +94,8 @@ impl std::ops::Add<Ty> for Ty {
 impl<'de> Deserialize<'de> for Ty {
     #[inline]
     fn deserialize<D>(deserializer: D) -> Result<Ty, D::Error>
-        where D: serde::Deserializer<'de>
+    where
+        D: serde::Deserializer<'de>,
     {
         struct ValueVisitor;
 
@@ -106,53 +107,63 @@ impl<'de> Deserialize<'de> for Ty {
             }
 
             fn visit_bool<E>(self, _: bool) -> Result<Self::Value, E>
-                where E: Error
+            where
+                E: Error,
             {
                 Ok(Ty::Bool)
             }
             fn visit_i64<E>(self, _: i64) -> Result<Self::Value, E>
-                where E: Error
+            where
+                E: Error,
             {
                 Ok(Ty::I)
             }
             fn visit_u64<E>(self, _: u64) -> Result<Self::Value, E>
-                where E: Error
+            where
+                E: Error,
             {
                 Ok(Ty::U)
             }
             fn visit_f64<E>(self, _: f64) -> Result<Self::Value, E>
-                where E: Error
+            where
+                E: Error,
             {
                 Ok(Ty::F)
             }
             fn visit_char<E>(self, _: char) -> Result<Self::Value, E>
-                where E: Error
+            where
+                E: Error,
             {
                 Ok(Ty::Char)
             }
             fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
-                where E: Error
+            where
+                E: Error,
             {
                 Ok(Ty::Str(v.to_owned()))
             }
             fn visit_bytes<E>(self, _: &[u8]) -> Result<Self::Value, E>
-                where E: Error
+            where
+                E: Error,
             {
                 Ok(Ty::Bytes)
             }
 
             fn visit_none<E>(self) -> Result<Self::Value, E>
-                where E: Error
+            where
+                E: Error,
             {
                 Ok(Ty::None)
             }
             fn visit_some<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
-                where D: Deserializer<'de>
+            where
+                D: Deserializer<'de>,
             {
                 Ok(Ty::Some(Box::new(Deserialize::deserialize(deserializer)?)))
             }
             fn visit_unit<E>(self) -> Result<Self::Value, E>
-                where E: Error
+            where
+                E: Error,
             {
                 //XXX
                 Ok(Ty::None)
@@ -164,7 +175,8 @@ impl<'de> Deserialize<'de> for Ty {
             { unimplemented!() }
             */
             fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
-                where A: SeqAccess<'de>
+            where
+                A: SeqAccess<'de>,
             {
                 let mut ty = Ty::Unit;
 
@@ -175,7 +187,8 @@ impl<'de> Deserialize<'de> for Ty {
             }
 
             fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
-                where A: MapAccess<'de>
+            where
+                A: MapAccess<'de>,
             {
                 let mut v = Vec::new();
 

@@ -9,13 +9,60 @@ use std::collections::HashMap;
 mod ty;
 pub use ty::Ty;
 
-const RESERVED: &[&str] = &["as", "break", "const", "continue", "crate", "else", "enum", "extern",
-                            "false", "fn", "for", "if", "impl", "in", "let", "loop", "match",
-                            "mod", "move", "mut", "pub", "ref", "return", "Self", "self",
-                            "static", "struct", "super", "trait", "true", "type", "unsafe", "use",
-                            "where", "while", "abstract", "alignof", "become", "box", "do",
-                            "final", "macro", "offsetof", "override", "priv", "proc", "pure",
-                            "sizeof", "typeof", "unsized", "virtual", "yield"];
+const RESERVED: &[&str] = &[
+    "as",
+    "break",
+    "const",
+    "continue",
+    "crate",
+    "else",
+    "enum",
+    "extern",
+    "false",
+    "fn",
+    "for",
+    "if",
+    "impl",
+    "in",
+    "let",
+    "loop",
+    "match",
+    "mod",
+    "move",
+    "mut",
+    "pub",
+    "ref",
+    "return",
+    "Self",
+    "self",
+    "static",
+    "struct",
+    "super",
+    "trait",
+    "true",
+    "type",
+    "unsafe",
+    "use",
+    "where",
+    "while",
+    "abstract",
+    "alignof",
+    "become",
+    "box",
+    "do",
+    "final",
+    "macro",
+    "offsetof",
+    "override",
+    "priv",
+    "proc",
+    "pure",
+    "sizeof",
+    "typeof",
+    "unsized",
+    "virtual",
+    "yield",
+];
 
 fn field_name(name: &str) -> String {
     if RESERVED.contains(&name) {
@@ -70,12 +117,13 @@ impl TyBuilder {
             }
 
             // Any, Unit, Some,
-            _ => unimplemented!(),
+            _ => "::serde_json::Value".to_owned(),
         }
     }
 
     pub fn build(&mut self, ty: Ty) -> String {
-        let mut s = "#[macro_use]\nextern crate serde_derive;\n\n".to_owned();
+        let mut s = "#[macro_use]\nextern crate serde_derive;\nextern crate serde_json;\n"
+            .to_owned();
 
         if let Ty::Map(v) = ty {
             let name = format!("Root");
@@ -83,12 +131,14 @@ impl TyBuilder {
         }
 
         while let Some((name, def)) = self.queue.pop() {
-            s.push_str(&format!(r#"#[derive(Serialize,Deserialize,Debug,PartialEq)]
+            s.push_str(&format!(
+                r#"#[derive(Serialize,Deserialize,Debug,PartialEq)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct {} {{
 "#,
-                                name));
+                name
+            ));
 
             for (name, ty) in def.into_iter() {
                 let field_name = field_name(&name);
@@ -97,10 +147,12 @@ pub struct {} {{
                 } else {
                     format!("    #[serde(rename = \"{}\")]\n", name)
                 };
-                s.push_str(&format!("{}    pub {}: {},\n",
-                                   prefix,
-                                   field_name,
-                                   self.ty_str(&name, ty)));
+                s.push_str(&format!(
+                    "{}    pub {}: {},\n",
+                    prefix,
+                    field_name,
+                    self.ty_str(&name, ty)
+                ));
             }
             s.push_str("}\n\n");
         }
@@ -117,8 +169,9 @@ error_chain!{
 
 /// generate rust structs based on JSON data
 pub fn translate<R, W>(r: &mut R, w: &mut W) -> Result<()>
-    where R: std::io::Read,
-          W: std::io::Write
+where
+    R: std::io::Read,
+    W: std::io::Write,
 {
     let v: Ty = serde_json::from_reader(r)?;
 
@@ -158,8 +211,9 @@ mod tests {
     }
 
     fn write_test_runner<W: Write>(w: &mut W, filename: &str) -> Result<()> {
-        write!(w,
-               r#"
+        write!(
+            w,
+            r#"
 extern crate serde_json;
 
 use std::fs::File;
@@ -178,7 +232,8 @@ fn test() {{
     let decoded2: Root = serde_json::from_str(&encoded).expect("failed to decode");
     assert_eq!(decoded, decoded2);
 }}"#,
-               filename)?;
+            filename
+        )?;
         Ok(())
     }
 
