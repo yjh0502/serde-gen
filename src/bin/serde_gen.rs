@@ -14,14 +14,15 @@ fn run() -> Result<()> {
     let matches = App::new("serde_gen")
         .version("0.1")
         .author("Jihyun Yu <yjh0502@gmail.com")
-        .arg(Arg::with_name("out")
-                 .long("out")
-                 .takes_value(true)
-                 .help("output rust filename, standard output if not exists"))
-        .arg(Arg::with_name("INPUT")
-                 .help("Sets the input file to use")
-                 .required(true)
-                 .multiple(true))
+        .arg(Arg::with_name("out").long("out").takes_value(true).help(
+            "output rust filename, standard output if not exists",
+        ))
+        .arg(
+            Arg::with_name("INPUT")
+                .help("Sets the input file to use")
+                .required(true)
+                .multiple(true),
+        )
         .get_matches();
 
     let mut ty: Ty = Ty::Unit;
