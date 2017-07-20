@@ -75,12 +75,18 @@ impl std::ops::Add<Ty> for Ty {
                 Ty::Map(m1)
             }
 
+            // merge seq
+            (Ty::Seq(m1), Ty::Seq(m2)) => Ty::Seq(Box::new(*m1 + *m2)),
+
             // nullable types
+            (Ty::Some(t1), Ty::Some(t2)) => Ty::Some(Box::new(*t1 + *t2)),
             (Ty::Some(t), Ty::None) => Ty::Some(t),
             (Ty::None, Ty::Some(t)) => Ty::Some(t),
 
             (Ty::Some(t1), t2) => Ty::Some(Box::new(*t1 + t2)),
             (t2, Ty::Some(t1)) => Ty::Some(Box::new(*t1 + t2)),
+
+            (Ty::None, Ty::None) => Ty::None,
 
             (t, Ty::None) => Ty::Some(Box::new(t)),
             (Ty::None, t) => Ty::Some(Box::new(t)),
