@@ -1,14 +1,14 @@
 #[macro_use]
 extern crate serde_derive;
-
-#[derive(Serialize,Deserialize,Debug,PartialEq)]
+extern crate serde_json;
+#[derive(Serialize,Deserialize,Debug,PartialEq,Clone,Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Root {
     pub SearchParkInfoService: Struct_SearchParkInfoService,
 }
 
-#[derive(Serialize,Deserialize,Debug,PartialEq)]
+#[derive(Serialize,Deserialize,Debug,PartialEq,Clone,Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Struct_SearchParkInfoService {
@@ -17,7 +17,7 @@ pub struct Struct_SearchParkInfoService {
     pub row: Vec<Struct_row>,
 }
 
-#[derive(Serialize,Deserialize,Debug,PartialEq)]
+#[derive(Serialize,Deserialize,Debug,PartialEq,Clone,Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Struct_row {
@@ -35,7 +35,7 @@ pub struct Struct_row {
     pub G_LATITUDE: f64,
 }
 
-#[derive(Serialize,Deserialize,Debug,PartialEq)]
+#[derive(Serialize,Deserialize,Debug,PartialEq,Clone,Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Struct_RESULT {
@@ -45,7 +45,6 @@ pub struct Struct_RESULT {
 
 
 
-extern crate serde_json;
 
 use std::fs::File;
 use std::io::prelude::*;

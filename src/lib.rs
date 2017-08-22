@@ -132,7 +132,7 @@ impl TyBuilder {
 
         while let Some((name, def)) = self.queue.pop() {
             s.push_str(&format!(
-                r#"#[derive(Serialize,Deserialize,Debug,PartialEq)]
+                r#"#[derive(Serialize,Deserialize,Debug,PartialEq,Clone,Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct {} {{
