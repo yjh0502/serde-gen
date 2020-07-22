@@ -68,6 +68,11 @@ impl TyBuilder {
                 name
             }
 
+            Ty::None => {
+                // none only, no detailed type info
+                "Option<()> // not enough type information".to_owned()
+            }
+
             // Any, Unit, Some,
             _ => "::serde_json::Value".to_owned(),
         }
