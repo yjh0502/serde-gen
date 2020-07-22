@@ -1,7 +1,4 @@
-#[macro_use]
-extern crate serde_derive;
-extern crate serde_json;
-#[derive(Serialize,Deserialize,Debug,PartialEq,Clone,Default)]
+#[derive(serde_derive::Serialize,serde_derive::Deserialize,Debug,PartialEq,Clone,Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Root {
@@ -11,14 +8,14 @@ pub struct Root {
     pub query: Struct_query,
 }
 
-#[derive(Serialize,Deserialize,Debug,PartialEq,Clone,Default)]
+#[derive(serde_derive::Serialize,serde_derive::Deserialize,Debug,PartialEq,Clone,Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Struct_query {
     pub recentchanges: Vec<Struct_recentchanges>,
 }
 
-#[derive(Serialize,Deserialize,Debug,PartialEq,Clone,Default)]
+#[derive(serde_derive::Serialize,serde_derive::Deserialize,Debug,PartialEq,Clone,Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Struct_recentchanges {
@@ -39,7 +36,7 @@ pub struct Struct_recentchanges {
     pub new: Option<String>,
 }
 
-#[derive(Serialize,Deserialize,Debug,PartialEq,Clone,Default)]
+#[derive(serde_derive::Serialize,serde_derive::Deserialize,Debug,PartialEq,Clone,Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Struct_continue {
@@ -50,6 +47,7 @@ pub struct Struct_continue {
 
 
 
+extern crate serde_json;
 
 use std::fs::File;
 use std::io::prelude::*;

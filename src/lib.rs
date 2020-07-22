@@ -28,6 +28,8 @@ fn field_name(name: &str) -> String {
 pub struct TyBuilder {
     names: HashMap<String, usize>,
     queue: Vec<(String, Vec<(String, Ty)>)>,
+
+    type_cache: HashMap<Ty, String>,
 }
 
 impl TyBuilder {
@@ -35,6 +37,8 @@ impl TyBuilder {
         TyBuilder {
             names: HashMap::new(),
             queue: Vec::new(),
+
+            type_cache: HashMap::new(),
         }
     }
 
@@ -50,6 +54,10 @@ impl TyBuilder {
     }
 
     fn ty_str(&mut self, key: &str, ty: Ty) -> String {
+        if let Some(name) = self.type_cache.get(&ty) {
+            return name.to_owned();
+        }
+
         match ty {
             Ty::Bool => "bool".into(),
             Ty::I => "isize".into(),
@@ -64,6 +72,7 @@ impl TyBuilder {
             Ty::Seq(ty) => format!("Vec<{}>", self.ty_str(key, *ty)),
             Ty::Map(m) => {
                 let name = self.struct_name(key.to_owned());
+                self.type_cache.insert(Ty::Map(m.clone()), name.clone());
                 self.queue.push((name.clone(), m));
                 name
             }
@@ -78,18 +87,16 @@ impl TyBuilder {
         }
     }
 
-    pub fn build(&mut self, ty: Ty) -> String {
-        let mut s =
-            "#[macro_use]\nextern crate serde_derive;\nextern crate serde_json;\n".to_owned();
+    pub fn build(&mut self, root_name: &str, ty: Ty) -> String {
+        let mut s = String::new();
 
         if let Ty::Map(v) = ty {
-            let name = format!("Root");
-            self.queue.push((name, v));
+            self.queue.push((root_name.to_owned(), v));
         }
 
         while let Some((name, def)) = self.queue.pop() {
             s.push_str(&format!(
-                r#"#[derive(Serialize,Deserialize,Debug,PartialEq,Clone,Default)]
+                r#"#[derive(serde_derive::Serialize,serde_derive::Deserialize,Debug,PartialEq,Clone,Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct {} {{
@@ -133,7 +140,7 @@ where
     let v: Ty = serde_json::from_reader(r)?;
 
     let mut builder = TyBuilder::new();
-    write!(w, "{}\n", builder.build(v))?;
+    write!(w, "{}\n", builder.build("Root", v))?;
     Ok(())
 }
 

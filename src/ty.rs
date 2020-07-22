@@ -1,8 +1,8 @@
-use std;
 use serde;
 use serde::de::*;
+use std;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Ty {
     Any,
     Unit,
@@ -92,7 +92,13 @@ impl std::ops::Add<Ty> for Ty {
             (Ty::None, t) => Ty::Some(Box::new(t)),
 
             // fallback to any
-            (s, o) => if s == o { s } else { Ty::Any },
+            (s, o) => {
+                if s == o {
+                    s
+                } else {
+                    Ty::Any
+                }
+            }
         }
     }
 }
