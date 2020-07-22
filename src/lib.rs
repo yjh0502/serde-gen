@@ -10,58 +10,11 @@ mod ty;
 pub use ty::Ty;
 
 const RESERVED: &[&str] = &[
-    "as",
-    "break",
-    "const",
-    "continue",
-    "crate",
-    "else",
-    "enum",
-    "extern",
-    "false",
-    "fn",
-    "for",
-    "if",
-    "impl",
-    "in",
-    "let",
-    "loop",
-    "match",
-    "mod",
-    "move",
-    "mut",
-    "pub",
-    "ref",
-    "return",
-    "Self",
-    "self",
-    "static",
-    "struct",
-    "super",
-    "trait",
-    "true",
-    "type",
-    "unsafe",
-    "use",
-    "where",
-    "while",
-    "abstract",
-    "alignof",
-    "become",
-    "box",
-    "do",
-    "final",
-    "macro",
-    "offsetof",
-    "override",
-    "priv",
-    "proc",
-    "pure",
-    "sizeof",
-    "typeof",
-    "unsized",
-    "virtual",
-    "yield",
+    "as", "break", "const", "continue", "crate", "else", "enum", "extern", "false", "fn", "for",
+    "if", "impl", "in", "let", "loop", "match", "mod", "move", "mut", "pub", "ref", "return",
+    "Self", "self", "static", "struct", "super", "trait", "true", "type", "unsafe", "use", "where",
+    "while", "abstract", "alignof", "become", "box", "do", "final", "macro", "offsetof",
+    "override", "priv", "proc", "pure", "sizeof", "typeof", "unsized", "virtual", "yield",
 ];
 
 fn field_name(name: &str) -> String {
@@ -71,7 +24,6 @@ fn field_name(name: &str) -> String {
         name.to_owned()
     }
 }
-
 
 pub struct TyBuilder {
     names: HashMap<String, usize>,
@@ -122,8 +74,8 @@ impl TyBuilder {
     }
 
     pub fn build(&mut self, ty: Ty) -> String {
-        let mut s = "#[macro_use]\nextern crate serde_derive;\nextern crate serde_json;\n"
-            .to_owned();
+        let mut s =
+            "#[macro_use]\nextern crate serde_derive;\nextern crate serde_json;\n".to_owned();
 
         if let Ty::Map(v) = ty {
             let name = format!("Root");
@@ -160,7 +112,7 @@ pub struct {} {{
     }
 }
 
-error_chain!{
+error_chain! {
     foreign_links {
         Io(std::io::Error);
         Json(serde_json::Error);
@@ -179,7 +131,6 @@ where
     write!(w, "{}\n", builder.build(v))?;
     Ok(())
 }
-
 
 #[cfg(test)]
 mod tests {
