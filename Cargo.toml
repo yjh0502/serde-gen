@@ -7,6 +7,6 @@ authors = ["yjh0502 <yjh0502@gmail.com>"]
 serde = "1"
 serde_derive = "1"
 serde_json = "1"
-error-chain = "0.10"
+error-chain = "0.12"
 
 clap = "2"
