@@ -1,11 +1,11 @@
-#[derive(serde_derive::Serialize,serde_derive::Deserialize,Debug,PartialEq,Clone,Default)]
+#[derive(serde_derive::Serialize, serde_derive::Deserialize, Debug, PartialEq, Clone, Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Root {
     pub SearchParkInfoService: Struct_SearchParkInfoService,
 }
 
-#[derive(serde_derive::Serialize,serde_derive::Deserialize,Debug,PartialEq,Clone,Default)]
+#[derive(serde_derive::Serialize, serde_derive::Deserialize, Debug, PartialEq, Clone, Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Struct_SearchParkInfoService {
@@ -14,7 +14,7 @@ pub struct Struct_SearchParkInfoService {
     pub row: Vec<Struct_row>,
 }
 
-#[derive(serde_derive::Serialize,serde_derive::Deserialize,Debug,PartialEq,Clone,Default)]
+#[derive(serde_derive::Serialize, serde_derive::Deserialize, Debug, PartialEq, Clone, Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Struct_row {
@@ -32,7 +32,7 @@ pub struct Struct_row {
     pub G_LATITUDE: f64,
 }
 
-#[derive(serde_derive::Serialize,serde_derive::Deserialize,Debug,PartialEq,Clone,Default)]
+#[derive(serde_derive::Serialize, serde_derive::Deserialize, Debug, PartialEq, Clone, Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Struct_RESULT {

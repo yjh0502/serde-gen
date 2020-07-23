@@ -1,4 +1,4 @@
-#[derive(serde_derive::Serialize,serde_derive::Deserialize,Debug,PartialEq,Clone,Default)]
+#[derive(serde_derive::Serialize, serde_derive::Deserialize, Debug, PartialEq, Clone, Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Root {
@@ -8,14 +8,14 @@ pub struct Root {
     pub query: Struct_query,
 }
 
-#[derive(serde_derive::Serialize,serde_derive::Deserialize,Debug,PartialEq,Clone,Default)]
+#[derive(serde_derive::Serialize, serde_derive::Deserialize, Debug, PartialEq, Clone, Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Struct_query {
     pub recentchanges: Vec<Struct_recentchanges>,
 }
 
-#[derive(serde_derive::Serialize,serde_derive::Deserialize,Debug,PartialEq,Clone,Default)]
+#[derive(serde_derive::Serialize, serde_derive::Deserialize, Debug, PartialEq, Clone, Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Struct_recentchanges {
@@ -36,7 +36,7 @@ pub struct Struct_recentchanges {
     pub new: Option<String>,
 }
 
-#[derive(serde_derive::Serialize,serde_derive::Deserialize,Debug,PartialEq,Clone,Default)]
+#[derive(serde_derive::Serialize, serde_derive::Deserialize, Debug, PartialEq, Clone, Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct Struct_continue {

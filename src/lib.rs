@@ -19,15 +19,22 @@ const RESERVED: &[&str] = &[
 
 fn field_name(name: &str) -> String {
     if RESERVED.contains(&name) {
-        format!("field_{}", name)
+        return format!("field_{}", name);
+    }
+    let replaced = name.replace(|c: char| !c.is_ascii_alphanumeric(), "_");
+
+    let c = replaced.chars().next().unwrap();
+    if c.is_ascii_digit() {
+        return format!("field_{}", replaced);
     } else {
-        name.to_owned()
+        replaced
     }
 }
 
 pub struct TyBuilder {
     names: HashMap<String, usize>,
     queue: Vec<(String, Vec<(String, Ty)>)>,
+    any_ty: String,
 
     type_cache: HashMap<Ty, String>,
 }
@@ -37,9 +44,14 @@ impl TyBuilder {
         TyBuilder {
             names: HashMap::new(),
             queue: Vec::new(),
+            any_ty: "::serde_json::Value".to_owned(),
 
             type_cache: HashMap::new(),
         }
+    }
+
+    pub fn set_any_ty(&mut self, any_ty: &str) {
+        self.any_ty = any_ty.to_owned();
     }
 
     fn struct_name(&mut self, ident: String) -> String {
@@ -79,11 +91,11 @@ impl TyBuilder {
 
             Ty::None => {
                 // none only, no detailed type info
-                "Option<()> // not enough type information".to_owned()
+                "Option<()>".to_owned()
             }
 
             // Any, Unit, Some,
-            _ => "::serde_json::Value".to_owned(),
+            _ => self.any_ty.clone(),
         }
     }
 
@@ -96,7 +108,7 @@ impl TyBuilder {
 
         while let Some((name, def)) = self.queue.pop() {
             s.push_str(&format!(
-                r#"#[derive(serde_derive::Serialize,serde_derive::Deserialize,Debug,PartialEq,Clone,Default)]
+                r#"#[derive(serde_derive::Serialize, serde_derive::Deserialize, Debug, PartialEq, Clone, Default)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 pub struct {} {{
@@ -225,5 +237,14 @@ fn test() {{
     #[test]
     fn test_testcases() {
         test_run_dir("tests").expect("failed to handle testcases");
+    }
+
+    #[test]
+    fn test_ident() {
+        assert_eq!("hello", field_name("hello"));
+        assert_eq!("field_01234", field_name("01234"));
+        assert_eq!("field_struct", field_name("struct"));
+
+        assert_eq!("hello_wor_ld", field_name("hello wor-ld"));
     }
 }
