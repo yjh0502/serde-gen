@@ -99,6 +99,12 @@ impl TyBuilder {
         }
     }
 
+    pub fn derive_headers() -> &'static str {
+        r#"#[derive(serde_derive::Serialize, serde_derive::Deserialize, Debug, PartialEq, Clone, Default)]
+#[allow(non_snake_case)]
+#[allow(non_camel_case_types)]"#
+    }
+
     pub fn build(&mut self, root_name: &str, ty: Ty) -> String {
         let mut s = String::new();
 
@@ -108,11 +114,10 @@ impl TyBuilder {
 
         while let Some((name, def)) = self.queue.pop() {
             s.push_str(&format!(
-                r#"#[derive(serde_derive::Serialize, serde_derive::Deserialize, Debug, PartialEq, Clone, Default)]
-#[allow(non_snake_case)]
-#[allow(non_camel_case_types)]
+                r#"{}
 pub struct {} {{
 "#,
+                Self::derive_headers(),
                 name
             ));
 
