@@ -34,11 +34,11 @@ impl std::ops::Add<Ty> for Ty {
             (Ty::I, Ty::U) => Ty::I,
             (Ty::U, Ty::I) => Ty::I,
 
-            // integer to float
+            // signed to float
             (Ty::I, Ty::F) => Ty::F,
             (Ty::F, Ty::I) => Ty::F,
 
-            // integer to float
+            // unsigned to float
             (Ty::U, Ty::F) => Ty::F,
             (Ty::F, Ty::U) => Ty::F,
 
