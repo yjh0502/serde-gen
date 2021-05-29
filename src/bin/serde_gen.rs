@@ -6,6 +6,7 @@ extern crate serde_gen;
 
 use std::fs::File;
 use std::io::Write;
+use std::io::{BufRead, BufReader};
 
 use clap::{App, Arg};
 use serde_gen::*;
@@ -21,6 +22,12 @@ fn run() -> Result<()> {
                 .help("output rust filename, standard output if not exists"),
         )
         .arg(
+            Arg::with_name("ndjson")
+                .long("ndjson")
+                .takes_value(false)
+                .help("accepts ndjson format"),
+        )
+        .arg(
             Arg::with_name("INPUT")
                 .help("Sets the input file to use")
                 .required(true)
@@ -33,9 +40,24 @@ fn run() -> Result<()> {
     if !matches.is_present("INPUT") {
         ty = ty + serde_json::from_reader(std::io::stdin())?;
     }
+
     for filename in matches.values_of("INPUT").unwrap() {
         let mut f = File::open(filename)?;
-        ty = ty + serde_json::from_reader(&mut f)?;
+
+        if matches.is_present("ndjson") {
+            let mut reader = BufReader::new(f);
+            let mut s = String::new();
+            loop {
+                let n = reader.read_line(&mut s)?;
+                if n == 0 {
+                    break;
+                }
+                ty = ty + serde_json::from_str(&s)?;
+                s.clear();
+            }
+        } else {
+            ty = ty + serde_json::from_reader(&mut f)?;
+        }
     }
 
     let mut builder = TyBuilder::new();
