@@ -8,10 +8,14 @@ use std::fs::File;
 use std::io::Write;
 use std::io::{BufRead, BufReader};
 
+use anyhow::Result;
 use clap::{App, Arg};
+use log::*;
 use serde_gen::*;
 
-fn run() -> Result<()> {
+fn main() -> Result<()> {
+    env_logger::init();
+
     let matches = App::new("serde_gen")
         .version("0.1")
         .author("Jihyun Yu <yjh0502@gmail.com")
@@ -59,16 +63,16 @@ fn run() -> Result<()> {
             ty = ty + serde_json::from_reader(&mut f)?;
         }
     }
+    debug!("ty={:?}", ty);
 
     let mut builder = TyBuilder::new();
     let out = builder.build("Root", ty);
+    debug!("out={}", out);
+
     match matches.value_of("out") {
         Some(filename) => write!(&mut File::create(filename)?, "{}\n", out)?,
         None => write!(&mut std::io::stdout(), "{}\n", out)?,
     };
-    Ok(())
-}
 
-fn main() {
-    run().expect("failed to run");
+    Ok(())
 }

@@ -105,11 +105,17 @@ impl TyBuilder {
 #[allow(non_camel_case_types)]"#
     }
 
-    pub fn build(&mut self, root_name: &str, ty: Ty) -> String {
+    pub fn build(&mut self, root_name: &str, mut ty: Ty) -> String {
         let mut s = String::new();
+        let mut root_name = root_name.to_owned();
+
+        if let Ty::Seq(v) = ty {
+            root_name = format!("{}Elem", root_name);
+            ty = v.as_ref().clone();
+        }
 
         if let Ty::Map(v) = ty {
-            self.queue.push((root_name.to_owned(), v));
+            self.queue.push((root_name, v));
         }
 
         while let Some((name, def)) = self.queue.pop() {
