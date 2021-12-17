@@ -1,4 +1,3 @@
-extern crate clap;
 extern crate serde;
 extern crate serde_json;
 
@@ -9,46 +8,41 @@ use std::io::Write;
 use std::io::{BufRead, BufReader};
 
 use anyhow::Result;
-use clap::{App, Arg};
 use log::*;
 use serde_gen::*;
+
+use argh::FromArgs;
+
+#[derive(FromArgs, Debug)]
+/// Reach new heights.
+struct Args {
+    /// how high to go
+    #[argh(option)]
+    out: Option<String>,
+
+    #[argh(switch, description = "input is ndjson")]
+    ndjson: bool,
+
+    #[argh(positional)]
+    inputs: Vec<String>,
+}
 
 fn main() -> Result<()> {
     env_logger::init();
 
-    let matches = App::new("serde_gen")
-        .version("0.1")
-        .author("Jihyun Yu <yjh0502@gmail.com")
-        .arg(
-            Arg::with_name("out")
-                .long("out")
-                .takes_value(true)
-                .help("output rust filename, standard output if not exists"),
-        )
-        .arg(
-            Arg::with_name("ndjson")
-                .long("ndjson")
-                .takes_value(false)
-                .help("accepts ndjson format"),
-        )
-        .arg(
-            Arg::with_name("INPUT")
-                .help("Sets the input file to use")
-                .required(true)
-                .multiple(true),
-        )
-        .get_matches();
+    let args: Args = argh::from_env();
+    info!("args={:?}", args);
 
     let mut ty: Ty = Ty::Unit;
 
-    if !matches.is_present("INPUT") {
+    if args.inputs.is_empty() {
         ty = ty + serde_json::from_reader(std::io::stdin())?;
     }
 
-    for filename in matches.values_of("INPUT").unwrap() {
+    for filename in args.inputs {
         let mut f = File::open(filename)?;
 
-        if matches.is_present("ndjson") {
+        if args.ndjson {
             let mut reader = BufReader::new(f);
             let mut s = String::new();
             loop {
@@ -69,7 +63,7 @@ fn main() -> Result<()> {
     let out = builder.build("Root", ty);
     debug!("out={}", out);
 
-    match matches.value_of("out") {
+    match args.out {
         Some(filename) => write!(&mut File::create(filename)?, "{}\n", out)?,
         None => write!(&mut std::io::stdout(), "{}\n", out)?,
     };
