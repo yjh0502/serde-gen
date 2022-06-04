@@ -1,13 +1,7 @@
-extern crate serde;
-extern crate serde_json;
-
-extern crate serde_gen;
-
 use std::fs::File;
 use std::io::Write;
 use std::io::{BufRead, BufReader};
 
-use anyhow::Result;
 use log::*;
 use serde_gen::*;
 

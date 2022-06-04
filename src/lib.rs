@@ -1,10 +1,5 @@
-extern crate serde;
-extern crate serde_json;
-
-#[macro_use]
-extern crate error_chain;
-
 use std::collections::HashMap;
+use thiserror::Error;
 
 mod ty;
 pub use ty::Ty;
@@ -147,12 +142,15 @@ pub struct {} {{
     }
 }
 
-error_chain! {
-    foreign_links {
-        Io(std::io::Error);
-        Json(serde_json::Error);
-    }
+#[derive(Error, Debug)]
+pub enum Error {
+    #[error("failed to read")]
+    Io(#[from] std::io::Error),
+    #[error("invalid json")]
+    Json(#[from] serde_json::Error),
 }
+
+pub type Result<T> = std::result::Result<T, Error>;
 
 /// generate rust structs based on JSON data
 pub fn translate<R, W>(r: &mut R, w: &mut W) -> Result<()>
