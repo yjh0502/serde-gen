@@ -140,6 +140,26 @@ pub struct {} {{
         }
         s
     }
+
+    pub fn build_test_runner(name: &str) -> String {
+        return format!(
+            r#"
+fn {}<T>(s: &str)
+where
+    T: serde::Serialize + for<'a> serde::Deserialize<'a> + std::cmp::PartialEq,
+{{
+    let decoded0: T = serde_json::from_str(s).expect("failed to decode");
+    let encoded0 = serde_json::to_string(&decoded0).expect("failed to encode");
+    let decoded1: T = serde_json::from_str(&encoded0).expect("failed to decode");
+    let encoded1 = serde_json::to_string(&decoded1).expect("failed to encode");
+
+    assert_eq!(encoded0, encoded1);
+    assert!(std::cmp::PartialEq::eq(&decoded0, &decoded1));
+}}
+"#,
+            name
+        );
+    }
 }
 
 #[derive(Error, Debug)]
@@ -161,7 +181,7 @@ where
     let v: Ty = serde_json::from_reader(r)?;
 
     let mut builder = TyBuilder::new();
-    write!(w, "{}\n", builder.build("Root", v))?;
+    write!(w, "{}", builder.build("Root", v))?;
     Ok(())
 }
 
@@ -197,25 +217,14 @@ mod tests {
     fn write_test_runner<W: Write>(w: &mut W, filename: &str) -> Result<()> {
         write!(
             w,
-            r#"
-extern crate serde_json;
-
-use std::fs::File;
-use std::io::prelude::*;
-
+            r#"{}
 #[test]
 fn test() {{
     let filename = "{}";
-    let mut file = File::open(filename).expect("failed to open file");
-
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).expect("failed to read file");
-    let decoded: Root = serde_json::from_str(&contents).expect("failed to decode");
-
-    let encoded = serde_json::to_string(&decoded).expect("failed to encode");
-    let decoded2: Root = serde_json::from_str(&encoded).expect("failed to decode");
-    assert_eq!(decoded, decoded2);
+    let contents = std::fs::read_to_string(filename).expect("failed to read");
+    test_runner::<Root>(&contents);
 }}"#,
+            TyBuilder::build_test_runner("test_runner"),
             filename
         )?;
         Ok(())
